@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hong Kong Monthly Temperature – Matrix View</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 1rem 2rem;
+      background: #f8f9fa;
+    }
+    h1 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    #container {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .tooltip {
+      position: absolute;
+      padding: 6px 10px;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      font-size: 12px;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .tooltip.visible {
+      opacity: 1;
+    }
+    #legend-wrap {
+      margin-top: 1rem;
+    }
+    .cell-line {
+      fill: none;
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke;
+    }
+    .cell-line-max {
+      stroke: #2e7d32;
+    }
+    .cell-line-min {
+      stroke: rgba(255,255,255,0.85);
+    }
+  </style>
+</head>
+<body>
+  <h1>Hong Kong Monthly Temperature (last 10 years)</h1>
+  <p id="instruction">Click the matrix to switch between <strong>maximum</strong> and <strong>minimum</strong> monthly temperature. Hover a cell for details.</p>
+  <div id="container">
+    <div id="matrix-wrap"></div>
+  </div>
+  <div id="tooltip" class="tooltip"></div>
+  <script src="main.js"></script>
+</body>
+</html>
