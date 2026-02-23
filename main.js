@@ -209,6 +209,13 @@
     legendG.append("g")
       .attr("transform", `translate(${legendBarWidth},0)`)
       .call(d3.axisRight(legendAxis).ticks(5).tickSize(4));
+    legendG.append("text")
+      .attr("x", legendBarWidth + 28)
+      .attr("y", 0)
+      .attr("text-anchor", "start")
+      .attr("dominant-baseline", "middle")
+      .attr("font-size", 10)
+      .text("C°");
   }
 
   // load csv and draw the matrix
