@@ -1,11 +1,8 @@
-/**
- * Hong Kong Monthly Temperature matrix (2008–2017).
- * Click a cell to toggle max/min; hover for tooltip.
- */
+
 (function () {
   "use strict";
 
-  // --- Constants ---
+  // hardcoded years and months
   const YEARS = [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017];
   const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const MONTH_NAMES = [
@@ -13,9 +10,11 @@
     "July", "August", "September", "October", "November", "December"
   ];
 
+  // cell dimensions and padding
   const cellWidth = 72;
   const cellHeight = 52;
   const linePadding = 4;
+  // padding for the matrix
   const paddingLeft = 80;
   const paddingTop = 40;
   const paddingRight = 20;
@@ -23,16 +22,18 @@
   const legendBarWidth = 24;
   const legendGap = 16;
 
+  // start on max temp view
   let useMax = true;
   let data = null;
   let matrixG = null;
   const tooltip = d3.select("#tooltip");
+  //legend graient
   const legendColors = ["#6a0dad", "#1e90ff", "#f5f57a", "#ffd700", "#ff8c00", "#dc143c"]; // purple → blue → light yellow → yellow → orange → red
   const colorScale = d3.scaleLinear()
     .domain([0, 8, 16, 24, 32, 40])
     .range(legendColors);
 
-  // --- Data: CSV rows → grid cells (year, month, month_max, month_min, daily) ---
+  // build grid from csv rows (month/year groups)
   function buildGridFromRows(rows) {
     const parseDate = d3.timeParse("%Y-%m-%d");
     const raw = rows.map((r) => ({
@@ -41,6 +42,7 @@
       min: +r.min_temperature,
     })).filter((d) => d.date);
 
+    // group by year and month, calculate max and min temperatures
     const byYearMonth = d3.rollup(
       raw,
       (group) => {
@@ -55,6 +57,7 @@
       (d) => d.date.getMonth() + 1
     );
 
+    // create cells array
     const cells = [];
     YEARS.forEach((year, xi) => {
       MONTHS.forEach((month, yi) => {
@@ -67,7 +70,7 @@
     return cells;
   }
 
-  /** SVG path for one line (daily max or min) in cell coordinates; lo/hi define the temperature range. */
+  // create line path for the mini line charts
   function linePath(values, tempMin, tempMax) {
     if (values.length < 2) return null;
     const w = cellWidth - 2 * linePadding;
@@ -80,7 +83,8 @@
       .y((v) => linePadding + scaleY(v))(values);
   }
 
-  // --- Main draw: SVG, axes, cells, legend ---
+
+  // draw the matrix, axes, cells, and legend
   function draw() {
     const cells = data;
     const gridWidth = YEARS.length * cellWidth;
@@ -94,6 +98,7 @@
       .attr("width", totalWidth)
       .attr("height", totalHeight);
 
+    // scales for the axes
     const xScale = d3.scaleBand()
       .domain(YEARS.map(String))
       .range([0, gridWidth])
@@ -137,6 +142,7 @@
       .attr("class", "cell")
       .attr("transform", (d) => `translate(${d.xi * cellWidth},${d.yi * cellHeight})`);
 
+    // create cells
     cell.append("rect")
       .attr("class", "cell-rect")
       .attr("width", cellWidth)
@@ -145,6 +151,7 @@
       .attr("stroke", "rgba(0,0,0,0.12)")
       .attr("stroke-width", 1)
       .style("cursor", "pointer")
+      // toggle max/min view
       .on("click", () => {
         useMax = !useMax;
         matrixG.selectAll(".cell-rect")
@@ -160,7 +167,7 @@
       })
       .on("mouseout", () => tooltip.classed("visible", false));
 
-    // Mini line charts (max = green, min = light) per cell
+    // draw the line charts for each cell
     cell.each(function (d) {
       const daily = d.daily || [];
       if (daily.length < 2) return;
@@ -169,15 +176,17 @@
       const tempMin = Math.min(...minTemps);
       const tempMax = Math.max(...maxTemps);
       const g = d3.select(this);
+      //max temp line
       g.append("path")
         .attr("class", "cell-line cell-line-max")
         .attr("d", linePath(maxTemps, tempMin, tempMax));
+      //min temp line
       g.append("path")
         .attr("class", "cell-line cell-line-min")
         .attr("d", linePath(minTemps, tempMin, tempMax));
     });
 
-    // Vertical color legend (right)
+    // legend gradient
     const legendG = svg.append("g")
       .attr("transform", `translate(${paddingLeft + gridWidth + legendGap},${paddingTop})`);
     const gradient = legendG.append("defs")
@@ -195,13 +204,14 @@
       .attr("height", gridHeight)
       .attr("fill", "url(#legend-gradient)")
       .attr("rx", 3);
+    // legend axis
     const legendAxis = d3.scaleLinear().domain([0, 40]).range([0, gridHeight]);
     legendG.append("g")
       .attr("transform", `translate(${legendBarWidth},0)`)
       .call(d3.axisRight(legendAxis).ticks(5).tickSize(4));
   }
 
-  // --- Load CSV and draw ---
+  // load csv and draw the matrix
   d3.csv("temperature_10y.csv")
     .then((rows) => {
       data = buildGridFromRows(rows);

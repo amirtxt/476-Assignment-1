@@ -15,12 +15,14 @@
       font-size: 1.25rem;
       margin-bottom: 0.5rem;
     }
+    /* Main container */
     #container {
       background: #fff;
       padding: 1rem;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
+    /* Floating tooltip styling*/
     .tooltip {
       position: absolute;
       padding: 6px 10px;
@@ -44,14 +46,15 @@
       vector-effect: non-scaling-stroke;
     }
     .cell-line-max {
-      stroke: #2e7d32;
+      stroke: #2e7d32; /* Green for max temp*/
     }
     .cell-line-min {
-      stroke: rgba(255,255,255,0.85);
+      stroke: rgba(255,255,255,0.85); /* white for min temp*/
     }
   </style>
 </head>
 <body>
+  /* title and instructions */
   <h1>Hong Kong Monthly Temperature (last 10 years)</h1>
   <p id="instruction">Click the matrix to switch between <strong>maximum</strong> and <strong>minimum</strong> monthly temperature. Hover a cell for details.</p>
   <div id="container">
